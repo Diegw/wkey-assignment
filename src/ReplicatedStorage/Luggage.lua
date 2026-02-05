@@ -19,6 +19,14 @@ function Luggage.new(parent: Instance)
 	self.Model.Name = "Luggage"
 	self.Model.Parent = self.LuggageFolder
 
+	local colorMeshPart :MeshPart = self.Model:FindFirstChild("Paint", true)
+	if colorMeshPart then
+		local r :number = math.random(0, 255)
+		local g :number = math.random(0, 255)
+		local b :number = math.random(0, 255)
+		colorMeshPart.Color = Color3.fromRGB(r, g, b)
+	end
+
 	self.InstanceId = self:GetUniqueId("luggage")
 	self.Distance = 0
 	self.YOffset = 1.25
