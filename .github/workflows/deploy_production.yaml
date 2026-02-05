@@ -1,0 +1,30 @@
+name: Deploy to production
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Foreman
+        uses: Roblox/setup-foreman@v3
+        with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            allow-external-github-orgs: true
+
+      - run: rojo build production.project.json -o production.rbxl
+      
+      - run: "curl --verbose --location POST 'https://apis.roblox.com/universes/v1/{9679459877}/places/{72177521282117}/versions?versionType=Published' \
+            --header 'x-api-key: ${{ secrets.WKEY_TOKEN }}' \
+            --header 'Content-Type: application/octet-stream' \
+            --data-binary @production.rbxl
+            --fail"
