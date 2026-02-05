@@ -198,24 +198,43 @@ end
 
 function Conveyor:ListenEvent()
 	local event :UnreliableRemoteEvent = ReplicatedStorage.Assets:FindFirstChild("ConveyorEvent")
-	if event == nil then
-		return
+	if event then
+		event.OnServerEvent:Connect(function(player, sign :number, variable :string)
+			if sign == nil or variable == nil then
+				return
+			end
+			sign = math.sign(sign)
+			if variable == "Speed" then
+				self.Speed += sign
+				self.Speed = math.clamp(self.Speed, 1, math.huge)
+				self.SpeedValueLabel.Text = self.Speed
+			elseif variable == "Frequency" then
+				self.LuggageSpawnFrequency += sign
+				self.LuggageSpawnFrequency = math.clamp(self.LuggageSpawnFrequency, 1, math.huge)
+				self.FrequencyValueLabel.Text = self.LuggageSpawnFrequency
+			end
+		end)
     end
-	event.OnServerEvent:Connect(function(player, sign :number, variable :string)
-		if sign == nil or variable == nil then
-			return
-		end
-		sign = math.sign(sign)
-		if variable == "Speed" then
-			self.Speed += sign
-			self.Speed = math.clamp(self.Speed, 1, math.huge)
-			self.SpeedValueLabel.Text = self.Speed
-		elseif variable == "Frequency" then
-			self.LuggageSpawnFrequency += sign
-			self.LuggageSpawnFrequency = math.clamp(self.LuggageSpawnFrequency, 1, math.huge)
-			self.FrequencyValueLabel.Text = self.LuggageSpawnFrequency
-		end
-	end)
+
+	local axisEvent :UnreliableRemoteEvent = ReplicatedStorage.Assets:FindFirstChild("ConveyorAxisEvent")
+	if axisEvent then
+		axisEvent.OnServerEvent:Connect(function(player, axis :Vector3, variable :string)
+			if axis == nil or variable == nil then
+				return
+			end
+			axis = Vector3.new(math.sign(axis.X), 0, math.sign(axis.Z))
+			if variable == "Start" then
+				local newPosition :Vector3 = self.StartPart.CFrame.Position + axis
+				self.StartPart.CFrame = CFrame.new(newPosition)
+			elseif variable == "Control" then
+				local newPosition :Vector3 = self.ControlPart.CFrame.Position + axis
+				self.ControlPart.CFrame = CFrame.new(newPosition)
+			elseif variable == "Finish" then
+				local newPosition :Vector3 = self.FinishPart.CFrame.Position + axis
+				self.FinishPart.CFrame = CFrame.new(newPosition)
+			end
+		end)
+    end
 end
 
 function Conveyor:SpawnLuggage()
