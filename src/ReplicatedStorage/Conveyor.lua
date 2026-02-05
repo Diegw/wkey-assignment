@@ -15,13 +15,13 @@ function Conveyor.new(model: Model)
 
 	self.Model = model
 	self.SegmentTemplate = ReplicatedStorage.Assets:FindFirstChild("ConveyorSegment")
-	self.Speed = 2 --TODO:set value with ui
+	self.Speed = 4 --TODO:set value with ui
     self.ScrollDistance = 0
     self.Rebuilding = false
     self.Segments = {}
 
     self.Luggage = {}
-	self.LuggageSpawnFrequency = 3
+	self.LuggageSpawnFrequency = 5
 	self.LuggageOffsetY = 2
 	self.LuggageLastTime = 0
 

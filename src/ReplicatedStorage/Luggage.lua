@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 
 local Luggage = {}
 Luggage.__index = Luggage
@@ -16,6 +17,7 @@ function Luggage.new(parent: Instance)
 	local luggageTemplate :Model = ReplicatedStorage.Assets:FindFirstChild("LuggageTemplate")
 
 	self.Model = luggageTemplate:Clone()
+	self.Model:ScaleTo(0.01)
 	self.Model.Name = "Luggage"
 	self.Model.Parent = self.LuggageFolder
 
@@ -24,7 +26,9 @@ function Luggage.new(parent: Instance)
 		local r :number = math.random(0, 255)
 		local g :number = math.random(0, 255)
 		local b :number = math.random(0, 255)
-		colorMeshPart.Color = Color3.fromRGB(r, g, b)
+		local color :Color3 = Color3.fromRGB(r, g, b)
+		colorMeshPart.Color = color
+		self.Color = color
 	end
 
 	self.InstanceId = self:GetUniqueId("luggage")
@@ -32,6 +36,8 @@ function Luggage.new(parent: Instance)
 	self.YOffset = 1.25
 
 	self:SetupProximityPrompt()
+	self:SetupVfx()
+	self:PlaySpawnAnimation()
 
 	return self
 end
@@ -67,6 +73,34 @@ function Luggage:SetupProximityPrompt()
 	end)
 end
 
+function Luggage:SetupVfx()
+	local vfx :Part = self.Model:FindFirstChild("Vfx", true)
+	if vfx == nil then
+		return
+	end
+	local particleEmitter :ParticleEmitter = vfx:FindFirstChildOfClass("ParticleEmitter")
+	if particleEmitter == nil then
+		return
+	end
+	particleEmitter.Color = ColorSequence.new(self.Color)
+	self.ParticleEmitter = particleEmitter
+end
+
+function Luggage:PlaySpawnAnimation()
+	self.ScaleInstance = Instance.new("NumberValue")
+	self.ScaleInstance.Value = 0.01
+	self.ScaleInstance.Parent = self.Model
+
+	self.ScaleInstance.Changed:Connect(function(value)
+		self.Model:ScaleTo(value)
+	end)
+
+	local tweenInfo :TweenInfo = TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+	local tweenGoal :table = { Value = 1 }
+	local tween = TweenService:Create(self.ScaleInstance, tweenInfo, tweenGoal)
+	tween:Play()
+end
+
 function Luggage:Update(curve, distance)
 	self.Distance = distance
 
@@ -78,10 +112,20 @@ function Luggage:Update(curve, distance)
 end
 
 function Luggage:Destroy()
-	if self.Model then
-		self.Model:Destroy()
-		self.Model = nil
-	end
+	local despawnTweenInfo :TweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	local despawnTweenGoal :table = { Value = 0.01 }
+	local despawnTween = TweenService:Create(self.ScaleInstance, despawnTweenInfo, despawnTweenGoal)
+
+	despawnTween.Completed:Once(function()
+		if self.Model then
+			self.Model:Destroy()
+			self.Model = nil
+		end
+	end)
+
+	self.ParticleEmitter.Enabled = true
+	self.ParticleEmitter:Emit(8)
+	despawnTween:Play()
 end
 
 return Luggage
