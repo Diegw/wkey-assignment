@@ -20,7 +20,7 @@ function Luggage.new(parent: Instance)
 	self.Model.Parent = self.LuggageFolder
 
 	self.Distance = 0
-	self.YOffset = 2
+	self.YOffset = 1.25
 
 	return self
 end
