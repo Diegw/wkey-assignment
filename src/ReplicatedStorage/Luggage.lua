@@ -19,10 +19,44 @@ function Luggage.new(parent: Instance)
 	self.Model.Name = "Luggage"
 	self.Model.Parent = self.LuggageFolder
 
+	self.InstanceId = self:GetUniqueId("luggage")
 	self.Distance = 0
 	self.YOffset = 1.25
 
+	self:SetupProximityPrompt()
+
 	return self
+end
+
+function Luggage:GetUniqueId(prefix :string?)
+	local newId :string = nil
+	if prefix ~= nil and type(prefix) == "string" and prefix ~= "" then
+		newId = (newId == nil) and prefix or newId.."."..prefix
+	end
+	local date = os.date("!*t")
+	if date ~= nil then
+		newId = (newId == nil) and date.year or newId.."."..date.year
+		newId = (newId == nil) and date.month or newId.."."..date.month
+		newId = (newId == nil) and date.day or newId.."."..date.day
+		newId = (newId == nil) and date.hour or newId.."."..date.hour
+		newId = (newId == nil) and date.min or newId.."."..date.min
+		newId = (newId == nil) and date.sec or newId.."."..date.sec
+	end
+	local clock :number = os.clock()
+	if clock ~= nil then
+		newId = (newId == nil) and clock or newId.."."..os.clock()
+	end
+	return newId
+end
+
+function Luggage:SetupProximityPrompt()
+	local proximityPrompt :ProximityPrompt = self.Model:FindFirstChild("ProximityPrompt", true)
+	if proximityPrompt == nil then
+		return
+	end
+	proximityPrompt.Triggered:Connect(function()
+		warn("Instance:"..self.InstanceId)
+	end)
 end
 
 function Luggage:Update(curve, distance)
