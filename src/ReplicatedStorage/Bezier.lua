@@ -1,7 +1,7 @@
 local Bezier = {}
 Bezier.__index = Bezier
 
-local ARC_SAMPLE_COUNT :number = 100
+local ARC_SAMPLE_COUNT :number = 50
 
 function Bezier.new(position0: Vector3, position1: Vector3, position2: Vector3)
 	if position0 == nil or position1 == nil or position2 == nil then

@@ -2,29 +2,30 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CONVEYOR_FOLDER_NAME = "Conveyor"
 
-local event :UnreliableRemoteEvent = nil
+local changeEvent :UnreliableRemoteEvent = nil
+local axisEvent :UnreliableRemoteEvent = nil
 
-local function FireConveyorAxisChangeEvent(sign :number, variable :string)
-    if sign == nil or variable == nil then
+local function FireConveyorAxisEvent(axis :Vector3, variable :string)
+    if axis == nil or variable == nil then
         return
     end
-    if event == nil then
-        event = ReplicatedStorage.Assets:FindFirstChild("ConveyorAxisEvent")
+    if axisEvent == nil then
+        axisEvent = ReplicatedStorage.Assets:FindFirstChild("ConveyorAxisEvent")
     end
-    if event then
-        event:FireServer(sign, variable)
+    if axisEvent then
+        axisEvent:FireServer(axis, variable)
     end
 end
 
-local function FireConveyorChangeValueEvent(sign :number, variable :string)
+local function FireConveyorChangeEvent(sign :number, variable :string)
     if sign == nil or variable == nil then
         return
     end
-    if event == nil then
-        event = ReplicatedStorage.Assets:FindFirstChild("ConveyorEvent")
+    if changeEvent == nil then
+        changeEvent = ReplicatedStorage.Assets:FindFirstChild("ConveyorEvent")
     end
-    if event then
-        event:FireServer(sign, variable)
+    if changeEvent then
+        changeEvent:FireServer(sign, variable)
     end
 end
 
@@ -32,19 +33,19 @@ local function SetupConveyorAxisSurfaceGui(surfaceGui :SurfaceGui, variable :str
     if surfaceGui == nil or not surfaceGui:IsA("SurfaceGui") then
         return
     end
-    warn(surfaceGui)
+
     local xFrame :Frame = surfaceGui:FindFirstChild("XFrame", true)
     if xFrame then
         local leftButton :ImageButton = xFrame:FindFirstChild("LeftButton", true)
         if leftButton then
             leftButton.MouseButton1Click:Connect(function()
-                FireConveyorAxisChangeEvent(-Vector3.xAxis, variable)
+                FireConveyorAxisEvent(-Vector3.xAxis, variable)
             end)
         end
         local rightButton :ImageButton = xFrame:FindFirstChild("RightButton", true)
         if rightButton then
             rightButton.MouseButton1Click:Connect(function()
-                FireConveyorAxisChangeEvent(Vector3.xAxis, variable)
+                FireConveyorAxisEvent(Vector3.xAxis, variable)
             end)
         end
     end
@@ -54,13 +55,13 @@ local function SetupConveyorAxisSurfaceGui(surfaceGui :SurfaceGui, variable :str
         local leftButton :ImageButton = zFrame:FindFirstChild("LeftButton", true)
         if leftButton then
             leftButton.MouseButton1Click:Connect(function()
-                FireConveyorAxisChangeEvent(-Vector3.zAxis, variable)
+                FireConveyorAxisEvent(-Vector3.zAxis, variable)
             end)
         end
         local rightButton :ImageButton = zFrame:FindFirstChild("RightButton", true)
         if rightButton then
             rightButton.MouseButton1Click:Connect(function()
-                FireConveyorAxisChangeEvent(Vector3.zAxis, variable)
+                FireConveyorAxisEvent(Vector3.zAxis, variable)
             end)
         end
     end
@@ -75,13 +76,13 @@ local function SetupConveyorSurfaceGui(surfaceGui :SurfaceGui)
         local leftButton :ImageButton = speedFrame:FindFirstChild("LeftButton", true)
         if leftButton then
             leftButton.MouseButton1Click:Connect(function()
-                FireConveyorChangeValueEvent(-1, "Speed")
+                FireConveyorChangeEvent(-1, "Speed")
             end)
         end
         local rightButton :ImageButton = speedFrame:FindFirstChild("RightButton", true)
         if rightButton then
             rightButton.MouseButton1Click:Connect(function()
-                FireConveyorChangeValueEvent(1, "Speed")
+                FireConveyorChangeEvent(1, "Speed")
             end)
         end
     end
@@ -91,13 +92,13 @@ local function SetupConveyorSurfaceGui(surfaceGui :SurfaceGui)
         local leftButton :ImageButton = frequencyFrame:FindFirstChild("LeftButton", true)
         if leftButton then
             leftButton.MouseButton1Click:Connect(function()
-                FireConveyorChangeValueEvent(-1, "Frequency")
+                FireConveyorChangeEvent(-1, "Frequency")
             end)
         end
         local rightButton :ImageButton = frequencyFrame:FindFirstChild("RightButton", true)
         if rightButton then
             rightButton.MouseButton1Click:Connect(function()
-                FireConveyorChangeValueEvent(1, "Frequency")
+                FireConveyorChangeEvent(1, "Frequency")
             end)
         end
     end
