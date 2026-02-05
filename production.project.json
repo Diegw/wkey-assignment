@@ -1,0 +1,115 @@
+{
+  "name": "wkey",
+  "servePlaceIds": [
+    97238450004995
+  ],
+  "placeId": 97238450004995,
+  "gameId": 9674727797,
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedFirst": {
+      "$className": "ReplicatedFirst",
+      "Source": {
+        "$path": "src/ReplicatedFirst"
+      },
+      "Assets": {
+        "$path": "assets/ReplicatedFirst"
+      }
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Source": {
+        "$path": "src/ReplicatedStorage"
+      },
+      "Assets": {
+        "$path": "assets/ReplicatedStorage"
+      }
+    },
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "Source": {
+        "$path": "src/ServerStorage"
+      },
+      "Assets": {
+        "$path": "assets/ServerStorage"
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Source": {
+        "$path": "src/ServerScriptService"
+      }
+    },
+    "StarterGui": {
+      "$className": "StarterGui",
+      "$path": "assets/StarterGui"
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "$path": "StarterPlayer",
+      "StarterCharacterScripts": {
+        "$className": "StarterCharacterScripts",
+        "$path": "src/StarterCharacterScripts"
+      },
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "$path": "src/StarterPlayerScripts"
+      },
+      "$properties": {
+        "DevComputerCameraMovementMode": {
+          "Enum" : 1
+        },
+        "DevTouchCameraMovementMode": {
+          "Enum" : 1
+        },
+        "EnableDynamicHeads": {
+          "Enum" : 1
+        }
+      }
+    },
+    "Workspace": {
+      "$className": "Workspace",
+      "World": {
+        "$path": "assets/Workspace/World/Lobby"
+      },
+      "Terrain": {
+        "$path": "assets/Workspace/Terrain/Lobby/Terrain.rbxmx"
+      },
+      "$properties": {
+        "FilteringEnabled": true,
+        "StreamingEnabled": {
+          "Bool" : true
+        },
+        "StreamingIntegrityMode": {
+          "Enum" : 2
+        },
+        "StreamingMinRadius": {
+          "Int32": 64
+        },
+        "StreamingTargetRadius": {
+          "Int32": 1024
+        },
+        "StreamingPauseMode": {
+          "Enum" : 2
+        },
+        "StreamOutBehavior": {
+          "Enum" : 2
+        }
+      }
+    },
+    "SoundService": {
+      "$properties": {
+        "RespectFilteringEnabled": true
+      }
+    },
+    "TextChatService": {
+      "$className":"TextChatService",
+      "$path": "assets/TextChatService",
+      "$properties": {
+        "ChatVersion": {
+          "Enum": 1
+        }
+      }
+    }
+  }
+}
