@@ -1,6 +1,7 @@
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Bezier = require(ReplicatedStorage.Source.Bezier)
+local Luggage = require(ReplicatedStorage.Source.Luggage)
 
 local Conveyor = {}
 Conveyor.__index = Conveyor
@@ -14,10 +15,15 @@ function Conveyor.new(model: Model)
 
 	self.Model = model
 	self.SegmentTemplate = ReplicatedStorage.Assets:FindFirstChild("ConveyorSegment")
-	self.Speed = 1 --TODO:set value with ui
+	self.Speed = 2 --TODO:set value with ui
     self.ScrollDistance = 0
     self.Rebuilding = false
     self.Segments = {}
+
+    self.Luggage = {}
+	self.LuggageSpawnFrequency = 3
+	self.LuggageOffsetY = 2
+	self.LuggageLastTime = 0
 
 	self.StartPart = model:FindFirstChild("Start")
 	self.ControlPart = model:FindFirstChild("Control")
@@ -68,9 +74,9 @@ end
 
 function Conveyor:PlaceSegments(inSegment :table)
 	local function PlaceSegment(segment :table)
-        local t = self.Curve:GetProgressFromDistance(segment.Distance)
-        local cf = self.Curve:GetCFrameFromProgress(t)
-        segment.Model:PivotTo(cf)
+        local progress :number = self.Curve:GetProgressFromDistance(segment.Distance)
+        local cframe :CFrame = self.Curve:GetCFrameFromProgress(progress)
+        segment.Model:PivotTo(cframe)
     end
 
     if inSegment ~= nil then
@@ -141,7 +147,30 @@ function Conveyor:Start()
 
             self:PlaceSegments(segment)
 		end
+
+		self.LuggageLastTime += dt
+		if self.LuggageLastTime >= self.LuggageSpawnFrequency then
+			self.LuggageLastTime = 0
+			self:SpawnLuggage()
+		end
+
+		for i = #self.Luggage, 1, -1 do
+			local luggage = self.Luggage[i]
+			luggage.Distance += delta
+
+			if luggage.Distance >= curveLength then
+				luggage:Destroy()
+				table.remove(self.Luggage, i)
+			else
+				luggage:Update(self.Curve, luggage.Distance)
+			end
+		end
 	end)
+end
+
+function Conveyor:SpawnLuggage()
+	local luggage = Luggage.new(self.Model)
+	table.insert(self.Luggage, luggage)
 end
 
 return Conveyor
