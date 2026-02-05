@@ -69,7 +69,7 @@ function Luggage:SetupProximityPrompt()
 		return
 	end
 	proximityPrompt.Triggered:Connect(function()
-		warn("Instance:"..self.InstanceId)
+		warn("Instance ID: ",self.InstanceId)
 	end)
 end
 
@@ -95,7 +95,7 @@ function Luggage:PlaySpawnAnimation()
 		self.Model:ScaleTo(value)
 	end)
 
-	local tweenInfo :TweenInfo = TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+	local tweenInfo :TweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 	local tweenGoal :table = { Value = 1 }
 	local tween = TweenService:Create(self.ScaleInstance, tweenInfo, tweenGoal)
 	tween:Play()

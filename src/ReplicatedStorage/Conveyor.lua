@@ -3,6 +3,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Bezier = require(ReplicatedStorage.Source.Bezier)
 local Luggage = require(ReplicatedStorage.Source.Luggage)
 
+local INITIAL_SPEED :number = 2
+local INITIAL_FREQUENCY :number = 4
+
 local Conveyor = {}
 Conveyor.__index = Conveyor
 
@@ -15,13 +18,13 @@ function Conveyor.new(model: Model)
 
 	self.Model = model
 	self.SegmentTemplate = ReplicatedStorage.Assets:FindFirstChild("ConveyorSegment")
-	self.Speed = 4 --TODO:set value with ui
+	self.Speed = INITIAL_SPEED
     self.ScrollDistance = 0
     self.Rebuilding = false
     self.Segments = {}
 
     self.Luggage = {}
-	self.LuggageSpawnFrequency = 5
+	self.LuggageSpawnFrequency = INITIAL_FREQUENCY
 	self.LuggageOffsetY = 2
 	self.LuggageLastTime = 0
 
@@ -40,6 +43,8 @@ function Conveyor.new(model: Model)
 	self:SpawnSegments()
 	self:PlaceSegments()
 	self:SetConnections()
+	self:SetupSurfaceGui()
+	self:ListenEvent()
 	self:Start()
 
 	return self
@@ -111,7 +116,7 @@ function Conveyor:SetConnections()
 
 			local segmentModel = self.SegmentTemplate:Clone()
 			segmentModel.Name = "Segment"
-			segmentModel.Parent = self.Model
+			segmentModel.Parent = self.SegmentsFolder
 
 			self.Segments[i] = {
 				Model = segmentModel,
@@ -126,6 +131,29 @@ function Conveyor:SetConnections()
 	self.StartPart:GetPropertyChangedSignal("Position"):Connect(RebuildCurve)
 	self.ControlPart:GetPropertyChangedSignal("Position"):Connect(RebuildCurve)
 	self.FinishPart:GetPropertyChangedSignal("Position"):Connect(RebuildCurve)
+end
+
+function Conveyor:SetupSurfaceGui()
+	local surfaceGui :SurfaceGui = self.Model:FindFirstChild("SurfaceGui", true)
+	if surfaceGui == nil then
+		return
+	end
+
+	local speedFrame :Frame = surfaceGui:FindFirstChild("SpeedFrame", true)
+	if speedFrame then
+		self.SpeedValueLabel = speedFrame:FindFirstChild("ValueLabel", true)
+		if self.SpeedValueLabel then
+			self.SpeedValueLabel.Text = self.Speed
+		end
+	end
+
+	local frequencyFrame :Frame = surfaceGui:FindFirstChild("FrequencyFrame", true)
+	if frequencyFrame then
+		self.FrequencyValueLabel = frequencyFrame:FindFirstChild("ValueLabel", true)
+		if self.FrequencyValueLabel then
+			self.FrequencyValueLabel.Text = self.LuggageSpawnFrequency
+		end
+	end
 end
 
 function Conveyor:Start()
@@ -164,6 +192,28 @@ function Conveyor:Start()
 			else
 				luggage:Update(self.Curve, luggage.Distance)
 			end
+		end
+	end)
+end
+
+function Conveyor:ListenEvent()
+	local event :UnreliableRemoteEvent = ReplicatedStorage.Assets:FindFirstChild("ConveyorEvent")
+	if event == nil then
+		return
+    end
+	event.OnServerEvent:Connect(function(player, sign :number, variable :string)
+		if sign == nil or variable == nil then
+			return
+		end
+		sign = math.sign(sign)
+		if variable == "Speed" then
+			self.Speed += sign
+			self.Speed = math.clamp(self.Speed, 1, math.huge)
+			self.SpeedValueLabel.Text = self.Speed
+		elseif variable == "Frequency" then
+			self.LuggageSpawnFrequency += sign
+			self.LuggageSpawnFrequency = math.clamp(self.LuggageSpawnFrequency, 1, math.huge)
+			self.FrequencyValueLabel.Text = self.LuggageSpawnFrequency
 		end
 	end)
 end
