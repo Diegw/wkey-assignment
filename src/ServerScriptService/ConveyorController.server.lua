@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Conveyor = require(ReplicatedStorage.Source.Conveyor)
+-- local Conveyor = require(ReplicatedStorage.Source.Conveyor)
 
 local CONVEYOR_FOLDER_NAME = "Conveyor"
 
@@ -18,10 +18,10 @@ local function SetupConveyors()
         if conveyorModel == nil or not conveyorModel:IsA("Model") then
             continue
         end
-        local newConveyor = Conveyor.new(conveyorModel)
-        if newConveyor == nil then
-            warn("Conveyor is nil")
-        end
+        -- local newConveyor = Conveyor.new(conveyorModel)
+        -- if newConveyor == nil then
+        --     warn("Conveyor is nil")
+        -- end
     end
 end
 
