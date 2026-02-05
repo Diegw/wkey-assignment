@@ -1,10 +1,10 @@
 {
   "name": "wkey",
   "servePlaceIds": [
-    97238450004995
+    72177521282117
   ],
-  "placeId": 97238450004995,
-  "gameId": 9674727797,
+  "placeId": 72177521282117,
+  "gameId": 9679459877,
   "tree": {
     "$className": "DataModel",
     "ReplicatedFirst": {
