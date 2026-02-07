@@ -41,6 +41,11 @@ function Conveyor.new(model: Model)
 
 	self:SetupCurve()
 	self:SpawnSegments()
+
+	self.Model:SetAttribute("Speed", self.Speed)
+	self.Model:SetAttribute("Frequency", self.LuggageSpawnFrequency)
+	self.Model:SetAttribute("SegmentLength", self.SegmentLength)
+
 	self:PlaceSegments()
 	self:SetConnections()
 	self:SetupSurfaceGui()
@@ -73,13 +78,14 @@ function Conveyor:SpawnSegments()
 		self.Segments[i] = {
 			Model = segmentModel,
 			Distance = segmentDistance,
+			ArcIndex = 1,
 		}
 	end
 end
 
 function Conveyor:PlaceSegments(inSegment :table)
 	local function PlaceSegment(segment :table)
-        local progress :number = self.Curve:GetProgressFromDistance(segment.Distance)
+        local progress :number = self.Curve:GetProgressFromDistanceCached(segment.Distance, segment)
         local cframe :CFrame = self.Curve:GetCFrameFromProgress(progress)
         segment.Model:PivotTo(cframe)
     end
@@ -124,7 +130,7 @@ function Conveyor:SetConnections()
 			}
 		end
 
-		self:PlaceSegments()
+		-- self:PlaceSegments()
 		self.Rebuilding = false
 	end
 
@@ -169,11 +175,20 @@ function Conveyor:Start()
 			self.ScrollDistance -= curveLength
 		end
 
+		-- debugTimer += dt
+		-- if debugTimer >= 1 then
+		-- 	print("Bezier comparisons per second:", Bezier.DebugComparisons)
+		-- 	Bezier.DebugComparisons = 0
+		-- 	debugTimer = 0
+		-- end
+
 		for i, segment in ipairs(self.Segments) do
 			local distance = (self.ScrollDistance + (i - 1) * self.SegmentLength) % curveLength
+			if distance < segment.Distance then
+				segment.ArcIndex = 1
+			end
 			segment.Distance = distance
-
-            self:PlaceSegments(segment)
+            -- self:PlaceSegments(segment)
 		end
 
 		self.LuggageLastTime += dt
@@ -190,7 +205,7 @@ function Conveyor:Start()
 				luggage:Destroy()
 				table.remove(self.Luggage, i)
 			else
-				luggage:Update(self.Curve, luggage.Distance)
+				-- luggage:Update(self.Curve, luggage.Distance)
 			end
 		end
 	end)
@@ -207,10 +222,12 @@ function Conveyor:ListenEvent()
 			if variable == "Speed" then
 				self.Speed += sign
 				self.Speed = math.clamp(self.Speed, 1, math.huge)
+				self.Model:SetAttribute("Speed", self.Speed)
 				self.SpeedValueLabel.Text = self.Speed
 			elseif variable == "Frequency" then
 				self.LuggageSpawnFrequency += sign
 				self.LuggageSpawnFrequency = math.clamp(self.LuggageSpawnFrequency, 1, math.huge)
+				self.Model:SetAttribute("Frequency", self.LuggageSpawnFrequency)
 				self.FrequencyValueLabel.Text = self.LuggageSpawnFrequency
 			end
 		end)
@@ -239,6 +256,8 @@ end
 
 function Conveyor:SpawnLuggage()
 	local luggage = Luggage.new(self.Model)
+	luggage.Model:SetAttribute("Distance", 0)
+	luggage.Model:SetAttribute("Speed", self.Speed)
 	table.insert(self.Luggage, luggage)
 end
 

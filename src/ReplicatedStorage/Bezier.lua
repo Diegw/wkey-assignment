@@ -1,6 +1,7 @@
 local Bezier = {}
 Bezier.__index = Bezier
 
+-- Bezier.DebugComparisons = 0
 local ARC_SAMPLE_COUNT :number = 50
 
 function Bezier.new(position0: Vector3, position1: Vector3, position2: Vector3)
@@ -76,6 +77,7 @@ function Bezier:GetProgressFromDistance(distance: number): number
 	distance = math.clamp(distance, 0, self.TotalLength)
 
 	for i = 2, #self.ArcTable do
+		-- Bezier.DebugComparisons += 1
 		local previous = self.ArcTable[i - 1]
 		local current = self.ArcTable[i]
 
@@ -86,6 +88,31 @@ function Bezier:GetProgressFromDistance(distance: number): number
 	end
 
 	return 1
+end
+
+function Bezier:GetProgressFromDistanceCached(distance: number, state: table): number
+	distance = math.clamp(distance, 0, self.TotalLength)
+
+	local arcTable = self.ArcTable
+	local index = state.ArcIndex or 1
+
+	-- Advance forward only
+	while index < #arcTable and distance > arcTable[index + 1].length do
+		-- Bezier.DebugComparisons += 1
+		index += 1
+	end
+
+	state.ArcIndex = index
+
+	local current = arcTable[index]
+	local nextSample = arcTable[index + 1]
+
+	if not nextSample then
+		return 1
+	end
+
+	local alpha = (distance - current.length) / (nextSample.length - current.length)
+	return current.progress + alpha * (nextSample.progress - current.progress)
 end
 
 return Bezier

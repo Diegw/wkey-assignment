@@ -31,6 +31,7 @@ function Luggage.new(parent: Instance)
 		self.Color = color
 	end
 
+	self.ArcIndex = 1
 	self.InstanceId = self:GetUniqueId("luggage")
 	self.Distance = 0
 	self.YOffset = 1.25
@@ -104,7 +105,7 @@ end
 function Luggage:Update(curve, distance)
 	self.Distance = distance
 
-	local progress :number = curve:GetProgressFromDistance(distance)
+	local progress :number = curve:GetProgressFromDistanceCached(distance, self)
 	local cframe :CFrame = curve:GetCFrameFromProgress(progress)
 
 	cframe = cframe * CFrame.new(0, self.YOffset, 0)
